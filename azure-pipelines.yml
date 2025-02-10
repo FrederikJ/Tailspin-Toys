@@ -55,14 +55,13 @@ steps:
 - script: mkdir -p $(Build.SourcesDirectory)/TestResults/Coverage
   displayName: 'Create TestResults/Coverage folder'
 
-- task: VSTest@2
+- task: DotNetCoreCLI@2
   displayName: 'Run unit tests with coverage - $(buildConfiguration)'
   inputs:
-    testAssemblyVer2: '**/*.Tests.dll'
-    searchFolder: '$(Build.SourcesDirectory)'
-    runSettingsFile: '$(Build.SourcesDirectory)/Tailspin.SpaceGame.Web.Tests/coverlet.runsettings'
-    codeCoverageEnabled: true
-    configuration: '$(buildConfiguration)'
+    command: 'test'
+    arguments: '--no-build --configuration $(buildConfiguration) /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=$(Build.SourcesDirectory)/TestResults/Coverage/coverage.cobertura.xml'
+    publishTestResults: true
+    projects: '**/*.Tests.csproj'
 
 - script: ls -la $(Build.SourcesDirectory)/.config
   displayName: 'List contents of .config folder'
