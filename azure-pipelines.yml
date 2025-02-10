@@ -70,7 +70,7 @@ steps:
   displayName: 'List installed .NET tools'
 
 - script: ls -la $(Build.SourcesDirectory)/TestResults/Coverage
-  displayName: 'List contents of TestResults/Coverage folder'
+  displayName: 'List contents of TestResults/Coverage folder!'
 
 - script: dotnet tool run reportgenerator -reports:$(Build.SourcesDirectory)/TestResults/Coverage/coverage.cobertura.xml -targetdir:$(Build.SourcesDirectory)/CodeCoverage -reporttypes:HtmlInline_AzurePipelines
   displayName: 'Run ReportGenerator with detailed logs'
