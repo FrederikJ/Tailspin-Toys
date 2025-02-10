@@ -60,6 +60,9 @@ steps:
     publishTestResults: true
     projects: '**/*.Tests.csproj'
 
+- script: dotnet tool list -g
+  displayName: 'List installed .NET tools'
+
 - task: DotNetCoreCLI@2
   displayName: 'Create code coverage report'
   inputs:
