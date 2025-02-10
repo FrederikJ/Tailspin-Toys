@@ -52,6 +52,9 @@ steps:
     custom: tool
     arguments: 'restore'
 
+- script: mkdir -p $(Build.SourcesDirectory)/TestResults/Coverage
+  displayName: 'Create TestResults/Coverage folder'
+
 - task: DotNetCoreCLI@2
   displayName: 'Run unit tests - $(buildConfiguration)'
   inputs:
