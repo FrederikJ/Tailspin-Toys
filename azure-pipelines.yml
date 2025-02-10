@@ -60,8 +60,15 @@ steps:
     publishTestResults: true
     projects: '**/*.Tests.csproj'
 
+- script: ls -la $(Build.SourcesDirectory)/.config
+  displayName: 'List contents of .config folder'
+
 - script: dotnet tool list -g
   displayName: 'List installed .NET tools'
+
+- script: dotnet tool run reportgenerator -reports:$(Build.SourcesDirectory)/**/coverage.cobertura.xml -targetdir:$(Build.SourcesDirectory)/CodeCoverage -reporttypes:HtmlInline_AzurePipelines
+  displayName: 'Run ReportGenerator with detailed logs'
+  continueOnError: true
 
 - task: DotNetCoreCLI@2
   displayName: 'Create code coverage report'
