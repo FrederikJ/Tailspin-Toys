@@ -55,13 +55,8 @@ steps:
 - script: mkdir -p $(Build.SourcesDirectory)/TestResults/Coverage
   displayName: 'Create TestResults/Coverage folder'
 
-- task: DotNetCoreCLI@2
+- script: MSYS2_ARG_CONV_EXCL="*" dotnet test --no-build --configuration $(buildConfiguration) /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=$(Build.SourcesDirectory)/TestResults/Coverage/
   displayName: 'Run unit tests - $(buildConfiguration)'
-  inputs:
-    command: 'test'
-    arguments: '--no-build --configuration $(buildConfiguration) /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=$(Build.SourcesDirectory)/TestResults/Coverage/'
-    publishTestResults: true
-    projects: '**/*.Tests.csproj'
 
 - script: ls -la $(Build.SourcesDirectory)/.config
   displayName: 'List contents of .config folder'
