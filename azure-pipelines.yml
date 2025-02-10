@@ -46,11 +46,7 @@ steps:
     projects: '**/*.csproj'
 
 - task: DotNetCoreCLI@2
-<<<<<<< HEAD
   displayName: 'Install .NET tools from local manifest'
-=======
-  displayName: 'Install .NET Core tools from local manifest'
->>>>>>> failed-test
   inputs:
     command: custom
     custom: tool
