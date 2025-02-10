@@ -55,14 +55,19 @@ steps:
 - script: mkdir -p $(Build.SourcesDirectory)/TestResults/Coverage
   displayName: 'Create TestResults/Coverage folder'
 
-- script: MSYS2_ARG_CONV_EXCL="*" dotnet test --no-build --configuration $(buildConfiguration) /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=$(Build.SourcesDirectory)/TestResults/Coverage/
-  displayName: 'Run unit tests - $(buildConfiguration)'
+- script: |
+    MSYS2_ARG_CONV_EXCL="*" dotnet test --no-build --configuration $(buildConfiguration) /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=$(Build.SourcesDirectory)/TestResults/Coverage/
+  displayName: 'Run unit tests with coverage - $(buildConfiguration)'
+
+- task: PublishTestResults@2
+  displayName: 'Publish test results'
+  inputs:
+    testResultsFiles: '$(Agent.TempDirectory)/**/*.trx'
+    mergeTestResults: true
+    testRunTitle: 'Run unit tests with coverage - $(buildConfiguration)'
 
 - script: ls -la $(Build.SourcesDirectory)/.config
   displayName: 'List contents of .config folder'
-
-- script: ls -la $(Build.SourcesDirectory)/.config
-  displayName: 'List contents of coverage folder'
 
 - script: dotnet tool list -g
   displayName: 'List installed .NET tools'
