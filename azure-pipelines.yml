@@ -86,6 +86,9 @@ stages:
     - publish: '$(Build.ArtifactStagingDirectory)'
       artifact: drop
 
+    - script: echo $(Build.ArtifactStagingDirectory)
+      displayName: 'Print Build ArtifactStagingDirectory'
+
 - stage: 'Deploy'
   displayName: 'Deploy the web application'
   dependsOn: Build
@@ -100,6 +103,22 @@ stages:
       runOnce:
         deploy:
           steps:
+          - script: echo $(buildConfiguration)
+            displayName: 'Print buildConfiguration'
+
+          - script: echo $(Pipeline.Workspace)
+            displayName: 'Print pipeline Workspace'
+
+          - script: echo $(Build.ArtifactStagingDirectory)
+            displayName: 'Print Build ArtifactStagingDirectory'
+
+          - script: ls -la $(Pipeline.Workspace)/drop/$(buildConfiguration)
+            displayName: 'List contents of TestResults/Coverage folder'
+
+          - script: ls -la $(Build.ArtifactStagingDirectory)/drop/$(buildConfiguration)
+            displayName: 'List contents of TestResults/Coverage folder'
+
+
           - download: current
             artifact: drop
           - task: AzureWebApp@1
