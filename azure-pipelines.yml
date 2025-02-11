@@ -109,14 +109,20 @@ stages:
           - script: echo $(Build.ArtifactStagingDirectory)
             displayName: 'Print Build ArtifactStagingDirectory'
 
+          - script: ls -la $(Pipeline.Workspace)
+            displayName: 'List contents of Pipeline.Workspace folder'
+
           - script: ls -la $(Build.ArtifactStagingDirectory)
-            displayName: 'List contents of TestResults/Coverage folder'
+            displayName: 'List contents of Build.ArtifactStagingDirectory folder'
+
+          - script: ls -la $(Pipeline.Workspace/drop)
+            displayName: 'List contents of Pipeline.Workspace/drop folder'
 
           - script: ls -la $(Build.ArtifactStagingDirectory)/drop
-            displayName: 'List contents of TestResults/Coverage folder'
+            displayName: 'List contents of Build.ArtifactStagingDirectory/drop folder'
 
           - script: ls -la $(Build.ArtifactStagingDirectory)/drop/$(buildConfiguration)
-            displayName: 'List contents of TestResults/Coverage folder'
+            displayName: 'List contents of Build.ArtifactStagingDirectory/drop/$(buildConfiguration) folder'
 
 
           - download: current
