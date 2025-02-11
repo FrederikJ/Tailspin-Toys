@@ -109,6 +109,12 @@ stages:
           - script: echo $(Build.ArtifactStagingDirectory)
             displayName: 'Print Build ArtifactStagingDirectory'
 
+          - script: ls -la $(Build.ArtifactStagingDirectory)
+            displayName: 'List contents of TestResults/Coverage folder'
+
+          - script: ls -la $(Build.ArtifactStagingDirectory)/drop
+            displayName: 'List contents of TestResults/Coverage folder'
+
           - script: ls -la $(Build.ArtifactStagingDirectory)/drop/$(buildConfiguration)
             displayName: 'List contents of TestResults/Coverage folder'
 
