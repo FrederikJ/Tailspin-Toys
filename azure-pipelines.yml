@@ -115,6 +115,15 @@ stages:
           - script: ls -la $(Build.ArtifactStagingDirectory)
             displayName: 'List contents of Build.ArtifactStagingDirectory folder'
 
+          - script: ls -la $(Pipeline.Workspace)/TestResults
+            displayName: 'List contents of Pipeline.Workspace/TestResults folder'
+
+          - script: ls -la $(Pipeline.Workspace)/b
+            displayName: 'List contents of Pipeline.Workspace folder'
+
+          - script: ls -la $(Pipeline.Workspace)/s
+            displayName: 'List contents of Pipeline.Workspace folder'
+
           - script: ls -la $(Pipeline.Workspace)/drop
             displayName: 'List contents of Pipeline.Workspace/drop folder'
 
