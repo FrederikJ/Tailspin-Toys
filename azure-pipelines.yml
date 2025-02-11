@@ -6,6 +6,9 @@
 trigger:
 - '*'
 
+variables:
+  buildConfiguration: 'Release'
+
 stages:
 - stage: 'Build'
   displayName: 'Build the web application'
@@ -18,7 +21,6 @@ stages:
       - npm
 
     variables:
-      buildConfiguration: 'Release'
       wwwrootDir: 'Tailspin.SpaceGame.Web/wwwroot'
       dotnetSdkVersion: '6.x'
 
@@ -27,10 +29,6 @@ stages:
       displayName: 'Use .NET SDK $(dotnetSdkVersion)'
       inputs:
         version: '$(dotnetSdkVersion)'
-
-    - task: NuGetToolInstaller@0
-      inputs:
-        versionSpec: '5.9.1'
 
     - task: Npm@1
       displayName: 'Run npm install'
@@ -47,41 +45,27 @@ stages:
       displayName: 'Write build info'
       workingDirectory: $(wwwrootDir)
 
-    - task: NuGetCommand@2
+    - task: DotNetCoreCLI@2
       displayName: 'Restore project dependencies'
       inputs:
         command: 'restore'
-        restoreSolution: '**/*.sln'
-        feedsToUse: 'select'
-        vstsFeed: '$(System.TeamProject)/Tailspin.SpaceGame.Web.Models'  
+        projects: '**/*.csproj'
 
     - task: DotNetCoreCLI@2
-      displayName: 'Install .NET tools from local manifest'
+      displayName: 'Build the project - $(buildConfiguration)'
       inputs:
-        command: custom
-        custom: tool
-        arguments: 'restore'
-
-    - template: templates/build.yml
-      parameters:
-        buildConfiguration: 'Debug'
-
-    - template: templates/build.yml
-      parameters:
-        buildConfiguration: 'Release'
+        command: 'build'
+        arguments: '--no-restore --configuration $(buildConfiguration)'
+        projects: '**/*.csproj'
 
     - task: DotNetCoreCLI@2
-      displayName: 'Create code coverage report'
+      displayName: 'Publish the project - $(buildConfiguration)'
       inputs:
-        command: custom
-        custom: tool
-        arguments: 'run reportgenerator -reports:$(Build.SourcesDirectory)/**/coverage.cobertura.xml -targetdir:$(Build.SourcesDirectory)/CodeCoverage -reporttypes:HtmlInline_AzurePipelines'
-
-    - task: PublishCodeCoverageResults@1
-      displayName: 'Publish code coverage report'
-      inputs:
-        codeCoverageTool: 'cobertura'
-        summaryFileLocation: '$(Build.SourcesDirectory)/**/coverage.cobertura.xml'
+        command: 'publish'
+        projects: '**/*.csproj'
+        publishWebProjects: false
+        arguments: '--no-build --configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/$(buildConfiguration)'
+        zipAfterPublish: true
 
     - publish: '$(Build.ArtifactStagingDirectory)'
       artifact: drop
@@ -100,40 +84,6 @@ stages:
       runOnce:
         deploy:
           steps:
-          - script: echo $(buildConfiguration)
-            displayName: 'Print buildConfiguration'
-
-          - script: echo $(Pipeline.Workspace)
-            displayName: 'Print pipeline Workspace'
-
-          - script: echo $(Build.ArtifactStagingDirectory)
-            displayName: 'Print Build ArtifactStagingDirectory'
-
-          - script: ls -la $(Pipeline.Workspace)
-            displayName: 'List contents of Pipeline.Workspace folder'
-
-          - script: ls -la $(Build.ArtifactStagingDirectory)
-            displayName: 'List contents of Build.ArtifactStagingDirectory folder'
-
-          - script: ls -la $(Pipeline.Workspace)/TestResults
-            displayName: 'List contents of Pipeline.Workspace/TestResults folder'
-
-          - script: ls -la $(Pipeline.Workspace)/b
-            displayName: 'List contents of Pipeline.Workspace folder'
-
-          - script: ls -la $(Pipeline.Workspace)/s
-            displayName: 'List contents of Pipeline.Workspace folder'
-
-          - script: ls -la $(Pipeline.Workspace)/drop
-            displayName: 'List contents of Pipeline.Workspace/drop folder'
-
-          - script: ls -la $(Build.ArtifactStagingDirectory)/drop
-            displayName: 'List contents of Build.ArtifactStagingDirectory/drop folder'
-
-          - script: ls -la $(Build.ArtifactStagingDirectory)/drop/$(buildConfiguration)
-            displayName: 'List contents of Build.ArtifactStagingDirectory/drop/$(buildConfiguration) folder'
-
-
           - download: current
             artifact: drop
           - task: AzureWebApp@1
@@ -141,4 +91,4 @@ stages:
             inputs:
               azureSubscription: 'Resource Manager - Tailspin - Space Game'
               appName: '$(WebAppName)'
-              package: '$(Build.ArtifactStagingDirectory)/drop/$(buildConfiguration)/*.zip'
+              package: '$(Pipeline.Workspace)/drop/$(buildConfiguration)/*.zip'
