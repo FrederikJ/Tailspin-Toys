@@ -86,9 +86,6 @@ stages:
     - publish: '$(Build.ArtifactStagingDirectory)'
       artifact: drop
 
-    - script: echo $(Build.ArtifactStagingDirectory)
-      displayName: 'Print Build ArtifactStagingDirectory'
-
 - stage: 'Deploy'
   displayName: 'Deploy the web application'
   dependsOn: Build
@@ -112,9 +109,6 @@ stages:
           - script: echo $(Build.ArtifactStagingDirectory)
             displayName: 'Print Build ArtifactStagingDirectory'
 
-          - script: ls -la $(Pipeline.Workspace)/drop/$(buildConfiguration)
-            displayName: 'List contents of TestResults/Coverage folder'
-
           - script: ls -la $(Build.ArtifactStagingDirectory)/drop/$(buildConfiguration)
             displayName: 'List contents of TestResults/Coverage folder'
 
@@ -126,4 +120,4 @@ stages:
             inputs:
               azureSubscription: 'Resource Manager - Tailspin - Space Game'
               appName: '$(WebAppName)'
-              package: '$(Pipeline.Workspace)/drop/$(buildConfiguration)/*.zip'
+              package: '$(Build.ArtifactStagingDirectory)/drop/$(buildConfiguration)/*.zip'
