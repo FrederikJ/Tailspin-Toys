@@ -1,3 +1,8 @@
+# ASP.NET Core
+# Build and test ASP.NET Core projects targeting .NET Core.
+# Add steps that run tests, create a NuGet package, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
+
 trigger:
 - '*'
 
@@ -45,20 +50,32 @@ steps:
     vstsFeed: '$(System.TeamProject)/Tailspin.SpaceGame.Web.Models'  
 
 - task: DotNetCoreCLI@2
-  displayName: 'Build the project - $(buildConfiguration)'
+  displayName: 'Install .NET tools from local manifest'
   inputs:
-    command: 'build'
-    arguments: '--no-restore --configuration $(buildConfiguration)'
-    projects: '**/*.csproj'
+    command: custom
+    custom: tool
+    arguments: 'restore'
+
+- template: templates/build.yml
+  parameters:
+    buildConfiguration: 'Debug'
+
+- template: templates/build.yml
+  parameters:
+    buildConfiguration: 'Release'
 
 - task: DotNetCoreCLI@2
-  displayName: 'Publish the project - $(buildConfiguration)'
+  displayName: 'Create code coverage report'
   inputs:
-    command: 'publish'
-    projects: '**/*.csproj'
-    publishWebProjects: false
-    arguments: '--no-build --configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/$(buildConfiguration)'
-    zipAfterPublish: true
+    command: custom
+    custom: tool
+    arguments: 'run reportgenerator -reports:$(Build.SourcesDirectory)/**/coverage.cobertura.xml -targetdir:$(Build.SourcesDirectory)/CodeCoverage -reporttypes:HtmlInline_AzurePipelines'
+
+- task: PublishCodeCoverageResults@1
+  displayName: 'Publish code coverage report'
+  inputs:
+    codeCoverageTool: 'cobertura'
+    summaryFileLocation: '$(Build.SourcesDirectory)/**/coverage.cobertura.xml'
 
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Artifact: drop'
