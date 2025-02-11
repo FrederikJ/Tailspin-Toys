@@ -30,6 +30,10 @@ stages:
       inputs:
         version: '$(dotnetSdkVersion)'
 
+    - task: NuGetToolInstaller@0
+      inputs:
+        versionSpec: '5.9.1'
+
     - task: Npm@1
       displayName: 'Run npm install'
       inputs:
