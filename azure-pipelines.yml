@@ -66,6 +66,10 @@ stages:
 
     - template: templates/build.yml
       parameters:
+        buildConfiguration: 'Debug'
+
+    - template: templates/build.yml
+      parameters:
         buildConfiguration: 'Release'
 
     - task: DotNetCoreCLI@2
