@@ -8,6 +8,16 @@ trigger:
 
 variables:
   buildConfiguration: 'Release'
+  releaseBranchName: 'release'
+  vmImage: 'ubuntu-20.04'
+
+schedules:
+- cron: '0 3 * * *'
+  displayName: 'Deploy every day at 3 A.M'
+  branches:
+    include:
+      - $(releaseBranchName)
+  always: false
 
 stages:
 - stage: 'Build'
@@ -16,7 +26,7 @@ stages:
   - job: 'Build'
     displayName: 'Build job'
     pool:
-      vmImage: 'ubuntu-20.04'
+      vmImage: '$(vmImage)'
       demands:
       - npm
 
@@ -88,13 +98,19 @@ stages:
     - publish: '$(Build.ArtifactStagingDirectory)'
       artifact: drop
 
-- stage: 'Deploy'
-  displayName: 'Deploy the web application'
+- stage: 'Dev'
+  displayName: 'Deploy to the dev environment'
   dependsOn: Build
+  condition: |
+    and
+    (
+      succeeded(),
+      eq(variables['Build.SourceBranchName'], variables['releaseBranchName'])
+    )
   jobs:
   - deployment: Deploy
     pool:
-      vmImage: 'ubuntu-20.04'
+      vmImage: '$(vmImage)'
     environment: dev
     variables:
     - group: Release
@@ -108,5 +124,52 @@ stages:
             displayName: 'Azure App Service Deploy: website'
             inputs:
               azureSubscription: 'Resource Manager - Tailspin - Space Game'
-              appName: '$(WebAppName)'
+              appName: '$(WebAppNameDev)'
+              package: '$(Pipeline.Workspace)/drop/$(buildConfiguration)/*Web.zip'
+        
+- stage: 'Test'
+  displayName: 'Deploy to the test environment'
+  dependsOn: Dev
+  condition: eq(variables['Build.Reason'], 'Schedule')
+  jobs:
+  - deployment: Deploy
+    pool:
+      vmImage: '$(vmImage)'
+    environment: test
+    variables:
+    - group: 'Release'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - download: current
+            artifact: drop
+          - task: AzureWebApp@1
+            displayName: 'Azure App Service Deploy: website'
+            inputs:
+              azureSubscription: 'Resource Manager - Tailspin - Space Game'
+              appName: '$(WebAppNameTest)'
+              package: '$(Pipeline.Workspace)/drop/$(buildConfiguration)/*Web.zip'
+
+- stage: 'Staging'
+  displayName: 'Deploy to the staging environment'
+  dependsOn: Test
+  jobs:
+  - deployment: Deploy
+    pool:
+      vmImage: '$(vmImage)'
+    environment: staging
+    variables:
+    - group: 'Release'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - download: current
+            artifact: drop
+          - task: AzureWebApp@1
+            displayName: 'Azure App Service Deploy: website'
+            inputs:
+              azureSubscription: 'Resource Manager - Tailspin - Space Game'
+              appName: '$(WebAppNameStaging)'
               package: '$(Pipeline.Workspace)/drop/$(buildConfiguration)/*Web.zip'
