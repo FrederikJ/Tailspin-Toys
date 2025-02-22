@@ -92,11 +92,11 @@ stages:
         custom: tool
         arguments: 'run reportgenerator -reports:$(Build.SourcesDirectory)/**/coverage.cobertura.xml -targetdir:$(Build.SourcesDirectory)/CodeCoverage -reporttypes:HtmlInline_AzurePipelines'
 
-    - task: PublishCodeCoverageResults@1
+    - task: PublishCodeCoverageResults@2
       displayName: 'Publish code coverage report'
       inputs:
-        codeCoverageTool: 'cobertura'
         summaryFileLocation: '$(Build.SourcesDirectory)/**/coverage.cobertura.xml'
+        pathToSources: '$(Build.SourcesDirectory)'
 
     - publish: '$(Build.ArtifactStagingDirectory)'
       artifact: drop
