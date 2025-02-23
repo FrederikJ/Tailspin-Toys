@@ -81,7 +81,6 @@ namespace UITests
             if (driver != null)
             {
                 driver.Quit();
-                driver.Dispose();
             }
         }
 
