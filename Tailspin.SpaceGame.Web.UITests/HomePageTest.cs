@@ -2,6 +2,7 @@
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Firefox;
+using OpenQA.Selenium.Edge;
 using OpenQA.Selenium.Support.UI;
 using System;
 using System.Collections;
@@ -37,6 +38,11 @@ namespace UITests
                     case "Firefox":
                         driver = new FirefoxDriver(
                             Environment.GetEnvironmentVariable("GeckoWebDriver")
+                        );
+                        break;
+                    case "Edge":
+                        driver = new EdgeDriver(
+                            Environment.GetEnvironmentVariable("EdgeWebDriver")
                         );
                         break;
                     default:
