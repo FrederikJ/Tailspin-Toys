@@ -17,8 +17,8 @@ variables:
   dotnetSdkVersion: '6.x'
 
 schedules:
-- cron: '0 3 * * *'
-  displayName: 'Deploy every day at 3 A.M'
+- cron: '0 5 * * *'
+  displayName: 'Deploy every day at 5 A.M'
   branches:
     include:
       - $(releaseBranchName)
