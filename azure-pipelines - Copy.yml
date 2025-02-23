@@ -160,6 +160,31 @@ stages:
               azureSubscription: 'Resource Manager - Tailspin - Space Game'
               appName: '$(WebAppNameTest)'
               package: '$(Pipeline.Workspace)/drop/$(buildConfiguration)/*Web.zip'
+  - job: RunUITests
+    dependsOn: Deploy
+    displayName: 'Run UI tests'
+    pool:
+      vmImage: 'windows-2019'
+    variables:
+    - group: 'Release'
+    steps: 
+    - task: UseDotNet@2
+      displayName: 'Use .NET SDK $(dotnetSdkVersion)'
+      inputs:
+        version: '$(dotnetSdkVersion)'
+    - task: DotNetCoreCLI@2
+      displayName: 'Build the project - $(buildConfiguration)'
+      inputs:
+        command: 'build'
+        arguments: '--configuration $(buildConfiguration)'
+        projects: '$(System.DefaultWorkingDirectory)/**/*UITests.csproj'
+    - task: DotNetCoreCLI@2
+      displayName: 'Run unit tests - $(buildConfiguration)'
+      inputs:
+        command: 'test'
+        arguments: '--no-build --configuration $(buildConfiguration)'
+        publishTestResults: true
+        projects: '$(System.DefaultWorkingDirectory)/**/*UITests.csproj'
 
 - stage: 'Staging'
   displayName: 'Deploy to the staging environment'
@@ -183,26 +208,3 @@ stages:
               azureSubscription: 'Resource Manager - Tailspin - Space Game'
               appName: '$(WebAppNameStaging)'
               package: '$(Pipeline.Workspace)/drop/$(buildConfiguration)/*Web.zip'
-  - job: RunLoadTests
-    dependsOn: Deploy
-    displayName: 'Run load tests'
-    pool:
-      vmImage: '$(vmImage)'
-    variables:
-    - group: Release
-    steps:
-    - script: |
-        wget -c archive.apache.org/dist/jmeter/binaries/apache-jmeter-$(jmeterVersion).tgz
-        tar -xzf apache-jmeter-$(jmeterVersion).tgz
-      displayName: 'Install Apache JMeter'
-    - script: apache-jmeter-$(jmeterVersion)/bin/./jmeter -n -t LoadTest.jmx -o Results.xml -Jhostname=$(STAGING_HOSTNAME)
-      displayName: 'Run Load tests'
-    - script: |
-        sudo apt-get update
-        sudo apt-get install xsltproc
-        xsltproc JMeter2JUnit.xsl Results.xml > JUnit.xml
-      displayName: 'Transform JMeter output to JUnit'
-    - task: PublishTestResults@2
-      inputs:
-        testResultsFormat: JUnit
-        testResultsFiles: JUnit.xml
