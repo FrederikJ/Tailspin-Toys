@@ -40,15 +40,6 @@ namespace UITests
                             Environment.GetEnvironmentVariable("GeckoWebDriver")
                         );
                         break;
-                    case "Edge":
-                        driver = new EdgeDriver(
-                            Environment.GetEnvironmentVariable("EdgeWebDriver"),
-                            new EdgeOptions
-                            {
-                                UseChromium = true
-                            }
-                        );
-                        break;
                     default:
                         throw new ArgumentException($"'{browser}': Unknown browser");
                 }
