@@ -4,6 +4,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <PublishChromeDriver>True</PublishChromeDriver>
     <IsPackable>false</IsPackable>
+    <ProjectGuid>{58F1099D-4385-42F3-8D62-9823883B58E7}</ProjectGuid>
   </PropertyGroup>
 
   <ItemGroup>
