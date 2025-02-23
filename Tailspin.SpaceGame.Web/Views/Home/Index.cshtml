@@ -5,13 +5,14 @@
 <section class="intro">
     <div class="container">
         <img class="title" src="/images/space-game-title.svg" alt="Space Game">
-        <p>Welcome to the official Space Game site!</p>
+        <p>An example site for learning</p>
     </div>
 </section>
 <section class="download">
     <div class="image-cap"></div>
     <div class="container">
-        <a href="" class="btn btn-default btn-lg" data-toggle="modal" data-target="#pretend-modal">Download game</a>
+        <a href="" id="download-btn" class="btn btn-default btn-lg" data-toggle="modal"
+            data-target="#pretend-modal">Download game</a>
     </div>
 </section>
 
@@ -19,10 +20,14 @@
 <section class="screens">
     <div class="container">
         <ul>
-            <li><a href="" data-toggle="modal" data-target=".pic-01"><img src="/images/space-game-placeholder.svg" alt=""></a></li>
-            <li><a href="" data-toggle="modal" data-target=".pic-01"><img src="/images/space-game-placeholder.svg" alt=""></a></li>
-            <li><a href="" data-toggle="modal" data-target=".pic-01"><img src="/images/space-game-placeholder.svg" alt=""></a></li>
-            <li><a href="" data-toggle="modal" data-target=".pic-01"><img src="/images/space-game-placeholder.svg" alt=""></a></li>
+            <li><a href="" id="screen-01" data-toggle="modal" data-target=".pic-01"><img
+                        src="/images/space-game-placeholder.svg" alt=""></a></li>
+            <li><a href="" id="screen-02" data-toggle="modal" data-target=".pic-01"><img
+                        src="/images/space-game-placeholder.svg" alt=""></a></li>
+            <li><a href="" id="screen-03" data-toggle="modal" data-target=".pic-01"><img
+                        src="/images/space-game-placeholder.svg" alt=""></a></li>
+            <li><a href="" id="screen-04" data-toggle="modal" data-target=".pic-01"><img
+                        src="/images/space-game-placeholder.svg" alt=""></a></li>
         </ul>
     </div>
 </section>
@@ -68,10 +73,11 @@
                             </div>
                             <div class="col-sm-4 score-data">
                                 <div style="text-align: left; margin-left: 100px;">
-                                    <partial name="Profile" model="new ProfileViewModel { Profile = score.Profile, Rank = (rank - 1).ToString() }" />
+                                    <partial name="Profile"
+                                        model="new ProfileViewModel { Profile = score.Profile, Rank = (rank - 1).ToString() }" />
                                     <a href="" data-toggle="modal" data-target="#profile-modal-@((rank - 1).ToString())">
                                         <img class="avatar" src="@score.Profile.AvatarUrl" alt="@score.Profile.UserName">
-                                        <div class="score-data username">
+                                        <div class="score-data username" id="profile-@((rank - 1).ToString())">
                                             @score.Profile.UserName
                                         </div>
                                     </a>
@@ -97,7 +103,8 @@
                         }
                         else
                         {
-                            <li class=""><a href="@Model.PrevLink" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
+                            <li class=""><a href="@Model.PrevLink" aria-label="Previous"><span
+                                        aria-hidden="true">&laquo;</span></a></li>
                         }
                         @{
                             var totalPages = Model.TotalResults / Model.PageSize;
@@ -109,7 +116,8 @@
                             for (int i = 1; i <= totalPages; i++)
                             {
                                 <li class="@(i == Model.Page ? "active" : null)">
-                                    <a href="@($"/?page={i}&pageSize={@Model.PageSize}&mode={@Model.SelectedMode}&region={@Model.SelectedRegion}")#leaderboard">
+                                    <a
+                                        href="@($"/?page={i}&pageSize={@Model.PageSize}&mode={@Model.SelectedMode}&region={@Model.SelectedRegion}")#leaderboard">
                                         @i
                                         <span class="sr-only">(current)</span>
                                     </a>
@@ -122,7 +130,8 @@
                         }
                         else
                         {
-                            <li class=""><a href="@Model.NextLink" aria-label="Next"><span aria-hidden="true">&raquo;</span></a></li>
+                            <li class=""><a href="@Model.NextLink" aria-label="Next"><span
+                                        aria-hidden="true">&raquo;</span></a></li>
                         }
                     </ul>
                 </nav>
@@ -152,7 +161,8 @@
                                     }
                                     else
                                     {
-                                        <li class="filter-button"><a href="/?mode=@mode&region=@Model.SelectedRegion#leaderboard">@mode</a></li>
+                                        <li class="filter-button"><a
+                                                href="/?mode=@mode&region=@Model.SelectedRegion#leaderboard">@mode</a></li>
                                     }
                                 }
                             }
@@ -180,7 +190,8 @@
                                     }
                                     else
                                     {
-                                        <li class="filter-button"><a href="/?mode=@Model.SelectedMode&region=@region#leaderboard">@region</a></li>
+                                        <li class="filter-button"><a
+                                                href="/?mode=@Model.SelectedMode&region=@region#leaderboard">@region</a></li>
                                     }
                                 }
                             }
@@ -196,15 +207,19 @@
 <!-- About section -->
 <section class="about">
     <h2>More about Space Game</h2>
-    <p>Space Game is an example website for learning purposes. Check out <a href="https://aka.ms/mslearndevops/">Microsoft Learn</a> to find out more.</p>
+    <p>Space Game is an example website for learning purposes. Check out <a
+            href="https://aka.ms/mslearndevops/">Microsoft Learn</a> to find out more.</p>
 </section>
 <section class="social">
     <div class="container">
         <div class="share">
             <ul>
-                <li><a href="" data-toggle="modal" data-target=".social-media"><img src="/images/space-game-placeholder.svg" alt="" /></a></li>
-                <li><a href="" data-toggle="modal" data-target=".social-media"><img src="/images/space-game-placeholder.svg" alt="" /></a></li>
-                <li><a href="" data-toggle="modal" data-target=".social-media"><img src="/images/space-game-placeholder.svg" alt="" /></a></li>
+                <li><a href="" data-toggle="modal" data-target=".social-media"><img
+                            src="/images/space-game-placeholder.svg" alt="" /></a></li>
+                <li><a href="" data-toggle="modal" data-target=".social-media"><img
+                            src="/images/space-game-placeholder.svg" alt="" /></a></li>
+                <li><a href="" data-toggle="modal" data-target=".social-media"><img
+                            src="/images/space-game-placeholder.svg" alt="" /></a></li>
             </ul>
         </div>
     </div>
@@ -227,7 +242,7 @@
 </div>
 
 <!-- Pic modals -->
-<div class="modal fade pic-01" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+<div class="modal fade pic-01" id="screen-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header no-border">

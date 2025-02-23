@@ -15,13 +15,13 @@ steps:
     command: 'test'
     arguments: '--no-build --configuration ${{ parameters.buildConfiguration }} /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=$(Build.SourcesDirectory)/TestResults/Coverage/'
     publishTestResults: true
-    projects: '**/*.Tests.csproj'
+    projects: '$(System.DefaultWorkingDirectory)/**/*Tests.csproj'
 
 - task: DotNetCoreCLI@2
   displayName: 'Publish the project - ${{ parameters.buildConfiguration }}'
   inputs:
     command: 'publish'
-    projects: '**/*.csproj'
+    projects: '$(System.DefaultWorkingDirectory)/**/*Web.csproj'
     publishWebProjects: false
     arguments: '--no-build --configuration ${{ parameters.buildConfiguration }} --output $(Build.ArtifactStagingDirectory)/${{ parameters.buildConfiguration }}'
     zipAfterPublish: true
