@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tailspin.SpaceGame.Web.Test
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tailspin.SpaceGame.Web.UITests", "Tailspin.SpaceGame.Web.UITests\Tailspin.SpaceGame.Web.UITests.csproj", "{58F1099D-4385-42F3-8D62-9823883B58E7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tailspin.SpaceGame.LeaderboardFunction", "Tailspin.SpaceGame.LeaderboardFunction\Tailspin.SpaceGame.LeaderboardFunction.csproj", "{B7CC0D44-CF98-4894-AF46-874C01AE3BEF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,5 +27,9 @@ Global
 		{58F1099D-4385-42F3-8D62-9823883B58E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{58F1099D-4385-42F3-8D62-9823883B58E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{58F1099D-4385-42F3-8D62-9823883B58E7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B7CC0D44-CF98-4894-AF46-874C01AE3BEF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B7CC0D44-CF98-4894-AF46-874C01AE3BEF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B7CC0D44-CF98-4894-AF46-874C01AE3BEF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B7CC0D44-CF98-4894-AF46-874C01AE3BEF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using TailSpin.SpaceGame.Web.Models;
 using Microsoft.AspNetCore.Http;
 
 
@@ -34,9 +28,7 @@ namespace TailSpin.SpaceGame.Web
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-            // Add document stores. These are passed to the HomeController constructor.
-            services.AddSingleton<IDocumentDBRepository<Score>>(new LocalDocumentDBRepository<Score>(@"SampleData/scores.json"));
-            services.AddSingleton<IDocumentDBRepository<Profile>>(new LocalDocumentDBRepository<Profile>(@"SampleData/profiles.json"));
+            services.AddSingleton<ILeaderboardServiceClient>(new LeaderboardFunctionClient(this.Configuration.GetSection("AppSettings").GetValue(typeof(string), "LeaderboardFunctionUrl").ToString()));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

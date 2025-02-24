@@ -135,7 +135,33 @@ stages:
             inputs:
               azureSubscription: 'Resource Manager - Tailspin - Space Game'
               appName: '$(WebAppNameDev)'
+              appType: webAppLinux
               package: '$(Pipeline.Workspace)/drop/$(buildConfiguration)/*Web.zip'
+          
+          - task: AzureFunctionApp@1
+            displayName: 'Azure Function Deploy: leaderboard'
+            inputs:
+              azureSubscription: 'Resource Manager - Tailspin - Space Game'
+              appType: functionAppLinux
+              appName: '$(LeaderboardAppName)'
+              package: '$(Pipeline.Workspace)/drop/$(buildConfiguration)/*Function.zip'
+              runtimeStack: DOCKER|microsoft/azure-functions-dotnet:4
+              startUpCommand: 'func azure functionapp publish $(functionAppName) --no-bundler'
+
+          - task: AzureAppServiceSettings@1
+            displayName: 'Update web app settings'
+            inputs:
+              azureSubscription: 'Resource Manager - Tailspin - Space Game'
+              appName: $(WebAppNameDev)
+              resourceGroupName: $(ResourceGroupName)
+              appSettings: |
+                [
+                  {
+                    "name": "AppSettings__LeaderboardFunctionUrl",
+                    "value": "http://$(LeaderboardAppName).azurewebsites.net/api/LeaderboardFunction",
+                    "slotSetting": false
+                  }
+                ]
         
 - stage: 'Test'
   displayName: 'Deploy to the test environment'
@@ -159,7 +185,16 @@ stages:
             inputs:
               azureSubscription: 'Resource Manager - Tailspin - Space Game'
               appName: '$(WebAppNameTest)'
+              appType: webAppLinux
               package: '$(Pipeline.Workspace)/drop/$(buildConfiguration)/*Web.zip'
+              appSettings: |
+                [
+                  {
+                    "name": "AppSettings__LeaderboardFunctionUrl",
+                    "value": "http://$(LeaderboardAppName).azurewebsites.net/api/LeaderboardFunction",
+                    "slotSetting": false
+                  }
+                ]
 
 - stage: 'Staging'
   displayName: 'Deploy to the staging environment'
@@ -185,7 +220,17 @@ stages:
               resourceGroupName: 'tailspin-toys-rg'
               slotName: 'swap'
               appName: '$(WebAppNameStaging)'
+              appType: webAppLinux
               package: '$(Pipeline.Workspace)/drop/$(buildConfiguration)/*Web.zip'
+              appSettings: |
+                [
+                  {
+                    "name": "AppSettings__LeaderboardFunctionUrl",
+                    "value": "http://$(LeaderboardAppName).azurewebsites.net/api/LeaderboardFunction",
+                    "slotSetting": false
+                  }
+                ]
+
           - task: AzureAppServiceManage@0
             displayName: 'Swap deployment slots'
             inputs:
@@ -195,6 +240,7 @@ stages:
               sourceSlot: 'swap'
               targetSlot: 'production'
               action: 'Swap Slots'
+              
   - job: RunLoadTests
     dependsOn: Deploy
     displayName: 'Run load tests'
