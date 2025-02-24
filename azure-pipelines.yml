@@ -72,17 +72,17 @@ stages:
         vstsFeed: '$(System.TeamProject)/Tailspin.SpaceGame.Web.Models'
 
     - task: DotNetCoreCLI@2
-      displayName: 'Restore NuGet packages'
-      inputs:
-        command: restore
-        projects: '**/*.csproj'
-
-    - task: DotNetCoreCLI@2
       displayName: 'Install .NET tools from local manifest'
       inputs:
         command: custom
         custom: tool
         arguments: 'restore'
+
+    - task: DotNetCoreCLI@2
+      displayName: 'Restore project dependencies'
+      inputs:
+        command: restore
+        projects: '**/*.csproj'
 
     - template: templates/build.yml
       parameters:
