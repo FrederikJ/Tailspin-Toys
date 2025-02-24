@@ -12,16 +12,16 @@ namespace Tests
 {
     public class DocumentDBRepository_GetItemsAsyncShould
     {
-        private IDocumentDBRepository<Score> _scoreRepository;
+        private IDocumentDBRepository<TailSpin.SpaceGame.Web.Models.Score> _scoreRepository;
         
         [SetUp]
         public void Setup()
         {
-            using (Stream scoresData = typeof(IDocumentDBRepository<Score>)
+            using (Stream scoresData = typeof(IDocumentDBRepository<TailSpin.SpaceGame.Web.Models.Score>)
                 .Assembly
                 .GetManifestResourceStream("Tailspin.SpaceGame.LeaderboardFunction.SampleData.scores.json"))
             {
-                _scoreRepository = new LocalDocumentDBRepository<Score>(scoresData);
+                _scoreRepository = new LocalDocumentDBRepository<TailSpin.SpaceGame.Web.Models.Score>(scoresData);
             }
         }
 
@@ -37,19 +37,19 @@ namespace Tests
 
             // Form the query predicate.
             // This expression selects all scores for the provided game region.
-            Func<Score, bool> queryPredicate = score => (score.GameRegion == gameRegion);
+            Func<TailSpin.SpaceGame.Web.Models.Score, bool> queryPredicate = score => (score.GameRegion == gameRegion);
 
             // Fetch the scores.
-            Task<IEnumerable<Score>> scoresTask = _scoreRepository.GetItemsAsync(
+            Task<IEnumerable<TailSpin.SpaceGame.Web.Models.Score>> scoresTask = _scoreRepository.GetItemsAsync(
                 queryPredicate, // the predicate defined above
                 score => 1, // we don't care about the order
                 PAGE,
                 MAX_RESULTS
             );
-            IEnumerable<Score> scores = scoresTask.Result;
+            IEnumerable<TailSpin.SpaceGame.Web.Models.Score> scores = scoresTask.Result;
 
             // Verify that each score's game region matches the provided game region.
-            Assert.That(scores, Is.All.Matches<Score>(score => score.GameRegion == gameRegion));
+            Assert.That(scores, Is.All.Matches<TailSpin.SpaceGame.Web.Models.Score>(score => score.GameRegion == gameRegion));
         }
 
         [TestCase(0, ExpectedResult = 0)]
@@ -60,13 +60,13 @@ namespace Tests
             const int PAGE = 0; // take the first page of results
 
             // Fetch the scores.
-            Task<IEnumerable<Score>> scoresTask = _scoreRepository.GetItemsAsync(
+            Task<IEnumerable<TailSpin.SpaceGame.Web.Models.Score>> scoresTask = _scoreRepository.GetItemsAsync(
                 score => true, // return all scores
                 score => 1, // we don't care about the order
                 PAGE,
                 count // fetch this number of results
             );
-            IEnumerable<Score> scores = scoresTask.Result;
+            IEnumerable<TailSpin.SpaceGame.Web.Models.Score> scores = scoresTask.Result;
 
             // Verify that we received the specified number of items.
             return scores.Count();
