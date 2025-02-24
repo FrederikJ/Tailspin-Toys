@@ -21,7 +21,9 @@ steps:
   displayName: 'Publish the project - ${{ parameters.buildConfiguration }}'
   inputs:
     command: 'publish'
-    projects: '$(System.DefaultWorkingDirectory)/**/*Web.csproj'
+    projects: |
+      '$(System.DefaultWorkingDirectory)/**/*Web.csproj'
+      '$(System.DefaultWorkingDirectory)/**/*LeaderboardFunction.csproj'
     publishWebProjects: false
     arguments: '--no-build --configuration ${{ parameters.buildConfiguration }} --output $(Build.ArtifactStagingDirectory)/${{ parameters.buildConfiguration }}'
     zipAfterPublish: true
