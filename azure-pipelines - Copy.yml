@@ -72,17 +72,17 @@ stages:
         vstsFeed: '$(System.TeamProject)/Tailspin.SpaceGame.Web.Models'
 
     - task: DotNetCoreCLI@2
-      displayName: 'Restore NuGet packages'
-      inputs:
-        command: restore
-        projects: '**/*.csproj'
-
-    - task: DotNetCoreCLI@2
       displayName: 'Install .NET tools from local manifest'
       inputs:
         command: custom
         custom: tool
         arguments: 'restore'
+
+    - task: DotNetCoreCLI@2
+      displayName: 'Restore project dependencies'
+      inputs:
+        command: restore
+        projects: '**/*.csproj'
 
     - template: templates/build.yml
       parameters:
@@ -92,18 +92,18 @@ stages:
       parameters:
         buildConfiguration: 'Release'
 
-    - task: DotNetCoreCLI@2
-      displayName: 'Create code coverage report'
-      inputs:
-        command: custom
-        custom: tool
-        arguments: 'run reportgenerator -reports:$(Build.SourcesDirectory)/**/coverage.cobertura.xml -targetdir:$(Build.SourcesDirectory)/CodeCoverage -reporttypes:HtmlInline_AzurePipelines'
+    #- task: DotNetCoreCLI@2
+    #  displayName: 'Create code coverage report'
+    #  inputs:
+    #    command: custom
+    #    custom: tool
+    #    arguments: 'run reportgenerator -reports:$(Build.SourcesDirectory)/**/coverage.cobertura.xml -targetdir:$(Build.SourcesDirectory)/CodeCoverage -reporttypes:HtmlInline_AzurePipelines'
 
-    - task: PublishCodeCoverageResults@2
-      displayName: 'Publish code coverage report'
-      inputs:
-        summaryFileLocation: '$(Build.SourcesDirectory)/**/coverage.cobertura.xml'
-        pathToSources: '$(Build.SourcesDirectory)'
+    #- task: PublishCodeCoverageResults@2
+    #  displayName: 'Publish code coverage report'
+    #  inputs:
+    #    summaryFileLocation: '$(Build.SourcesDirectory)/**/coverage.cobertura.xml'
+    #    pathToSources: '$(Build.SourcesDirectory)'
 
     - publish: '$(Build.ArtifactStagingDirectory)'
       artifact: drop
@@ -135,7 +135,33 @@ stages:
             inputs:
               azureSubscription: 'Resource Manager - Tailspin - Space Game'
               appName: '$(WebAppNameDev)'
+              appType: webAppLinux
               package: '$(Pipeline.Workspace)/drop/$(buildConfiguration)/*Web.zip'
+          
+          - task: AzureFunctionApp@1
+            displayName: 'Azure Function Deploy: leaderboard'
+            inputs:
+              azureSubscription: 'Resource Manager - Tailspin - Space Game'
+              appType: functionAppLinux
+              appName: '$(LeaderboardAppName)'
+              package: '$(Pipeline.Workspace)/drop/$(buildConfiguration)/*Function.zip'
+              runtimeStack: DOCKER|microsoft/azure-functions-dotnet:4
+              startUpCommand: 'func azure functionapp publish $(functionAppName) --no-bundler'
+
+          - task: AzureAppServiceSettings@1
+            displayName: 'Update web app settings'
+            inputs:
+              azureSubscription: 'Resource Manager - Tailspin - Space Game'
+              appName: $(WebAppNameDev)
+              resourceGroupName: $(ResourceGroupName)
+              appSettings: |
+                [
+                  {
+                    "name": "AppSettings__LeaderboardFunctionUrl",
+                    "value": "https://$(LeaderboardAppName).azurewebsites.net/api/LeaderboardFunction",
+                    "slotSetting": false
+                  }
+                ]
         
 - stage: 'Test'
   displayName: 'Deploy to the test environment'
@@ -159,32 +185,23 @@ stages:
             inputs:
               azureSubscription: 'Resource Manager - Tailspin - Space Game'
               appName: '$(WebAppNameTest)'
+              appType: webAppLinux
               package: '$(Pipeline.Workspace)/drop/$(buildConfiguration)/*Web.zip'
-  - job: RunUITests
-    dependsOn: Deploy
-    displayName: 'Run UI tests'
-    pool:
-      vmImage: 'windows-2019'
-    variables:
-    - group: 'Release'
-    steps: 
-    - task: UseDotNet@2
-      displayName: 'Use .NET SDK $(dotnetSdkVersion)'
-      inputs:
-        version: '$(dotnetSdkVersion)'
-    - task: DotNetCoreCLI@2
-      displayName: 'Build the project - $(buildConfiguration)'
-      inputs:
-        command: 'build'
-        arguments: '--configuration $(buildConfiguration)'
-        projects: '$(System.DefaultWorkingDirectory)/**/*UITests.csproj'
-    - task: DotNetCoreCLI@2
-      displayName: 'Run unit tests - $(buildConfiguration)'
-      inputs:
-        command: 'test'
-        arguments: '--no-build --configuration $(buildConfiguration)'
-        publishTestResults: true
-        projects: '$(System.DefaultWorkingDirectory)/**/*UITests.csproj'
+
+          - task: AzureAppServiceSettings@1
+            displayName: 'Update web app settings'
+            inputs:
+              azureSubscription: 'Resource Manager - Tailspin - Space Game'
+              appName: $(WebAppNameTest)
+              resourceGroupName: $(ResourceGroupName)
+              appSettings: |
+                [
+                  {
+                    "name": "AppSettings__LeaderboardFunctionUrl",
+                    "value": "https://$(LeaderboardAppName).azurewebsites.net/api/LeaderboardFunction",
+                    "slotSetting": false
+                  }
+                ]
 
 - stage: 'Staging'
   displayName: 'Deploy to the staging environment'
@@ -206,5 +223,58 @@ stages:
             displayName: 'Azure App Service Deploy: website'
             inputs:
               azureSubscription: 'Resource Manager - Tailspin - Space Game'
+              deployToSlotOrASE: true
+              resourceGroupName: 'tailspin-toys-rg'
+              slotName: 'swap'
               appName: '$(WebAppNameStaging)'
+              appType: webAppLinux
               package: '$(Pipeline.Workspace)/drop/$(buildConfiguration)/*Web.zip'
+
+          - task: AzureAppServiceSettings@1
+            displayName: 'Update web app settings'
+            inputs:
+              azureSubscription: 'Resource Manager - Tailspin - Space Game'
+              appName: $(WebAppNameStaging)
+              resourceGroupName: $(ResourceGroupName)
+              appSettings: |
+                [
+                  {
+                    "name": "AppSettings__LeaderboardFunctionUrl",
+                    "value": "https://$(LeaderboardAppName).azurewebsites.net/api/LeaderboardFunction",
+                    "slotSetting": false
+                  }
+                ]
+
+          - task: AzureAppServiceManage@0
+            displayName: 'Swap deployment slots'
+            inputs:
+              azureSubscription: 'Resource Manager - Tailspin - Space Game'
+              resourceGroupName: 'tailspin-toys-rg'
+              webAppName: '$(WebAppNameStaging)'
+              sourceSlot: 'swap'
+              targetSlot: 'production'
+              action: 'Swap Slots'
+
+  - job: RunLoadTests
+    dependsOn: Deploy
+    displayName: 'Run load tests'
+    pool:
+      vmImage: '$(vmImage)'
+    variables:
+    - group: Release
+    steps:
+    - script: |
+        wget -c archive.apache.org/dist/jmeter/binaries/apache-jmeter-$(jmeterVersion).tgz
+        tar -xzf apache-jmeter-$(jmeterVersion).tgz
+      displayName: 'Install Apache JMeter'
+    - script: apache-jmeter-$(jmeterVersion)/bin/./jmeter -n -t LoadTest.jmx -o Results.xml -Jhostname=$(STAGING_HOSTNAME)
+      displayName: 'Run Load tests'
+    - script: |
+        sudo apt-get update
+        sudo apt-get install xsltproc
+        xsltproc JMeter2JUnit.xsl Results.xml > JUnit.xml
+      displayName: 'Transform JMeter output to JUnit'
+    - task: PublishTestResults@2
+      inputs:
+        testResultsFormat: JUnit
+        testResultsFiles: JUnit.xml
