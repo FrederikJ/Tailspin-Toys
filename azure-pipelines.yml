@@ -92,18 +92,18 @@ stages:
       parameters:
         buildConfiguration: 'Release'
 
-    - task: DotNetCoreCLI@2
-      displayName: 'Create code coverage report'
-      inputs:
-        command: custom
-        custom: tool
-        arguments: 'run reportgenerator -reports:$(Build.SourcesDirectory)/**/coverage.cobertura.xml -targetdir:$(Build.SourcesDirectory)/CodeCoverage -reporttypes:HtmlInline_AzurePipelines'
+    #- task: DotNetCoreCLI@2
+    #  displayName: 'Create code coverage report'
+    #  inputs:
+    #    command: custom
+    #    custom: tool
+    #    arguments: 'run reportgenerator -reports:$(Build.SourcesDirectory)/**/coverage.cobertura.xml -targetdir:$(Build.SourcesDirectory)/CodeCoverage -reporttypes:HtmlInline_AzurePipelines'
 
-    - task: PublishCodeCoverageResults@2
-      displayName: 'Publish code coverage report'
-      inputs:
-        summaryFileLocation: '$(Build.SourcesDirectory)/**/coverage.cobertura.xml'
-        pathToSources: '$(Build.SourcesDirectory)'
+    #- task: PublishCodeCoverageResults@2
+    #  displayName: 'Publish code coverage report'
+    #  inputs:
+    #    summaryFileLocation: '$(Build.SourcesDirectory)/**/coverage.cobertura.xml'
+    #    pathToSources: '$(Build.SourcesDirectory)'
 
     - publish: '$(Build.ArtifactStagingDirectory)'
       artifact: drop
@@ -240,7 +240,7 @@ stages:
               sourceSlot: 'swap'
               targetSlot: 'production'
               action: 'Swap Slots'
-              
+
   - job: RunLoadTests
     dependsOn: Deploy
     displayName: 'Run load tests'
