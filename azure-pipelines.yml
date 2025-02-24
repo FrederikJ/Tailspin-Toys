@@ -206,6 +206,9 @@ stages:
 - stage: 'Staging'
   displayName: 'Deploy to the staging environment'
   dependsOn: Test
+  variables:
+    - name: system.debug
+      value: true
   jobs:
   - deployment: Deploy
     pool:
