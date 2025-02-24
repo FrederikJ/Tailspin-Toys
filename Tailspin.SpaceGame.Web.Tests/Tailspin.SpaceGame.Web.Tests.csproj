@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Tailspin.SpaceGame.Web\Tailspin.SpaceGame.Web.csproj" />
+    <ProjectReference Include="..\Tailspin.SpaceGame.LeaderboardFunction\Tailspin.SpaceGame.LeaderboardFunction.csproj" />
   </ItemGroup>
 
 </Project>
