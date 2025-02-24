@@ -186,8 +186,16 @@ stages:
               azureSubscription: 'Resource Manager - Tailspin - Space Game'
               appName: '$(WebAppNameTest)'
               appType: webAppLinux
+              resourceGroupName: $(ResourceGroupName)
               package: '$(Pipeline.Workspace)/drop/$(buildConfiguration)/*Web.zip'
-              
+              appSettings: |
+                [
+                  {
+                    "name": "AppSettings__LeaderboardFunctionUrl",
+                    "value": "https://$(LeaderboardAppName).azurewebsites.net/api/LeaderboardFunction",
+                    "slotSetting": false
+                  }
+                ]
 
 - stage: 'Staging'
   displayName: 'Deploy to the staging environment'
