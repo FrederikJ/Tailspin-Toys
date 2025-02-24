@@ -158,7 +158,7 @@ stages:
                 [
                   {
                     "name": "AppSettings__LeaderboardFunctionUrl",
-                    "value": "http://$(LeaderboardAppName).azurewebsites.net/api/LeaderboardFunction",
+                    "value": "https://$(LeaderboardAppName).azurewebsites.net/api/LeaderboardFunction",
                     "slotSetting": false
                   }
                 ]
@@ -187,14 +187,7 @@ stages:
               appName: '$(WebAppNameTest)'
               appType: webAppLinux
               package: '$(Pipeline.Workspace)/drop/$(buildConfiguration)/*Web.zip'
-              appSettings: |
-                [
-                  {
-                    "name": "AppSettings__LeaderboardFunctionUrl",
-                    "value": "http://$(LeaderboardAppName).azurewebsites.net/api/LeaderboardFunction",
-                    "slotSetting": false
-                  }
-                ]
+              
 
 - stage: 'Staging'
   displayName: 'Deploy to the staging environment'
@@ -226,7 +219,7 @@ stages:
                 [
                   {
                     "name": "AppSettings__LeaderboardFunctionUrl",
-                    "value": "http://$(LeaderboardAppName).azurewebsites.net/api/LeaderboardFunction",
+                    "value": "https://$(LeaderboardAppName).azurewebsites.net/api/LeaderboardFunction",
                     "slotSetting": false
                   }
                 ]
