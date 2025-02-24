@@ -232,6 +232,13 @@ stages:
               appName: '$(WebAppNameStaging)'
               appType: webAppLinux
               package: '$(Pipeline.Workspace)/drop/$(buildConfiguration)/*Web.zip'
+
+          - task: AzureAppServiceSettings@1
+            displayName: 'Update web app settings'
+            inputs:
+              azureSubscription: 'Resource Manager - Tailspin - Space Game'
+              appName: $(WebAppNameStaging)
+              resourceGroupName: $(ResourceGroupName)
               appSettings: |
                 [
                   {
