@@ -4,6 +4,11 @@
     <AzureFunctionsVersion>v4</AzureFunctionsVersion>
     <ProjectGuid>{B7CC0D44-CF98-4894-AF46-874C01AE3BEF}</ProjectGuid>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Tailspin.SpaceGame.Web.Models" Version="1.1.0-CI-20250224-145650" />
+  </ItemGroup>
+
   <ItemGroup>
     <None Remove="SampleData\profiles.json" />
     <None Remove="SampleData\scores.json" />
