@@ -15,8 +15,10 @@ variables:
   releaseBranchName: 'release'
   vmImage: 'ubuntu-20.04'
   dotnetSdkVersion: '6.x'
+  leaderboardRepository: 'leaderboard'
   webRepository: 'web'
   tag: '$(Build.BuildId)'
+  imagePullSecret: 'secret'
 
 schedules:
 - cron: '0 5 * * *'
@@ -36,7 +38,7 @@ stages:
       vmImage: '$(vmImage)'
     steps:
     - task: Docker@2
-      displayName: 'Build and push the image to container registry'
+      displayName: 'Build and push the web image to container registry'
       inputs:
         command: buildAndPush
         buildContext: $(Build.Repository.LocalPath)
@@ -46,53 +48,76 @@ stages:
         tags: |
           $(tag)
 
+    - task: Docker@2
+      displayName: 'Build and push the leaderboard image to container registry'
+      inputs:
+        command: buildAndPush
+        buildContext: $(Build.Repository.LocalPath)
+        repository: $(leaderboardRepository)
+        dockerfile: '$(Build.SourcesDirectory)/Tailspin.SpaceGame.LeaderboardContainer/Dockerfile.txt'
+        containerRegistry: 'Container Registry Connection'
+        tags: |
+          $(tag)
+
 - stage: 'Dev'
   displayName: 'Deploy the container to dev environment'
   dependsOn: Build
   jobs:
-  - job: 'Deploy'
+  - deployment: Deploy
     displayName: 'Deploy job'
     pool:
       vmImage: '$(vmImage)'
+    environment: 'Dev'
     variables:
     - group: Release
-    steps:
-    - task: AzureWebAppContainer@1
-      inputs:
-       appName: $(WebAppNameDev)
-       azureSubscription: 'Resource Manager - Tailspin - Space Game'
-       imageName: $(RegistryName)/$(webRepository):$(build.buildId)          
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: AzureWebAppContainer@1
+            inputs:
+              appName: $(WebAppNameDev)
+              azureSubscription: 'Resource Manager - Tailspin - Space Game'
+              imageName: $(RegistryName)/$(webRepository):$(build.buildId)          
  
 - stage: 'Test'
   displayName: 'Deploy the container to test environment'
   dependsOn: Build
   jobs:
-  - job: 'Deploy'
+  - deployment: Deploy
     displayName: 'Deploy job'
     pool:
       vmImage: '$(vmImage)'
+    environment: 'Test'
     variables:
     - group: Release
-    steps:
-    - task: AzureWebAppContainer@1
-      inputs:
-       appName: $(WebAppNameTest)
-       azureSubscription: 'Resource Manager - Tailspin - Space Game'
-       imageName: $(RegistryName)/$(webRepository):$(build.buildId)  
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: AzureWebAppContainer@1
+            inputs:
+              appName: $(WebAppNameTest)
+              azureSubscription: 'Resource Manager - Tailspin - Space Game'
+              imageName: $(RegistryName)/$(webRepository):$(build.buildId)  
 
 - stage: 'Staging'
   displayName: 'Deploy the container to staging environment'
   dependsOn: Build
   jobs:
-  - job: 'Deploy'
+  - deployment: Deploy
     displayName: 'Deploy job'
     pool:
       vmImage: '$(vmImage)'
+    environment: 'Staging'
     variables:
     - group: Release
-    steps:
-    - task: AzureWebAppContainer@1
-      inputs:
-       appName: $(WebAppNameStaging)
-       azureSubscription: 'Resource Manager - Tailspin - Space Game'
-       imageName: $(RegistryName)/$(webRepository):$(build.buildId)  
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: AzureWebAppContainer@1
+            inputs:
+              appName: $(WebAppNameStaging)
+              azureSubscription: 'Resource Manager - Tailspin - Space Game'
+              imageName: $(RegistryName)/$(webRepository):$(build.buildId)  
